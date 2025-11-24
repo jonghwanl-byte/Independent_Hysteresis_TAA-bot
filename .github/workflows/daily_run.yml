@@ -2,8 +2,10 @@ name: Independent-Hysteresis-TAA Daily Run
 
 on:
   schedule:
-    # 매일 23:00 UTC (한국 시간(KST) 아침 8시)
-    - cron: '0 23 * * *'
+    # 매주 월~금요일 오전 8시(KST) = 일요일~목요일 23:00 UTC
+    - cron: '0 23 * * 0-4'
+    
+  # 수동 실행 (Action 탭에서 'Run workflow' 버튼)
   workflow_dispatch:
 
 jobs:
