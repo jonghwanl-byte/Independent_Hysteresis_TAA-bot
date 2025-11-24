@@ -52,7 +52,12 @@
 
 ## 🚀 자동화 (GitHub Actions)
 
-이 저장소는 GitHub Actions를 통해 매일 오전 8시(KST)에 자동으로 실행되며, 텔레그램으로 투자 리포트를 전송합니다.
+이 저장소는 GitHub Actions를 통해 오전 8시(KST)에 자동으로 실행되도록 설정되어 있습니다.
+
+1.  **실행 시간:** 매주 월~금요일 오전 8:00 (KST)
+    * (월요일 8:00 KST = 일요일 23:00 UTC) -> 금요일 마감 데이터 기준
+    * (화~금 8:00 KST = 월~목 23:00 UTC) -> 전일 마감 데이터 기준
+2.  **알림:** 실행 완료 시 `daily_signal_generator.py`의 결과가 텔레그램으로 전송됩니다.
 
 ### 텔레그램 설정 (Secrets)
 GitHub 저장소의 `Settings` > `Secrets and variables` > `Actions`에 다음 두 가지를 등록해야 합니다.
