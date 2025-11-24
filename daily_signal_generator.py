@@ -29,7 +29,9 @@ def send_telegram_message(token, chat_id, message, parse_mode='Markdown'):
         print("텔레그램 TOKEN 또는 CHAT_ID가 설정되지 않았습니다.", file=sys.stderr)
         return False
         
-    url = f"[https://api.telegram.org/bot](https://api.telegram.org/bot){token}/sendMessage"
+    # [수정됨] URL에 마크다운 서식이 들어가지 않도록 주의
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    
     # 메시지가 길어질 수 있으므로 타임아웃을 넉넉히 설정
     payload = {'chat_id': chat_id, 'text': message, 'parse_mode': parse_mode}
     try:
@@ -154,10 +156,8 @@ def get_daily_signals_and_report():
     
     report.append("\n" + "-"*20)
 
-    # [3] 비중 변경 상세 (박스 제거됨)
+    # [3] 비중 변경 상세
     report.append("📊 **[2] 비중 변경 상세**")
-    # report.append("```")  <-- 박스 제거
-    # 타이틀 제거하고 내용만 심플하게 출력
     
     def format_change_row(name, yesterday, today):
         delta = today - yesterday
@@ -167,14 +167,12 @@ def get_daily_signals_and_report():
             emoji = "🔼" if delta > 0 else "🔽"
             change_str = f"{emoji} {delta:+.1%}"
         
-        # 텍스트 정렬 (박스 없이 최대한 줄 맞춤 시도)
         return f"{name}: {yesterday:.1%} → {today:.1%} | {change_str}"
 
     for ticker in TICKERS:
         report.append(format_change_row(ticker, yesterday_weights[ticker], today_weights[ticker]))
     
     report.append(format_change_row('현금', yesterday_total_cash, today_total_cash))
-    # report.append("```") <-- 박스 제거
     
     report.append("\n" + "-"*20)
     
@@ -186,7 +184,6 @@ def get_daily_signals_and_report():
     
     for ticker in TICKERS:
         emoji = "🔴" if price_change[ticker] >= 0 else "🔵"
-        # 증감율을 맨 뒤로 이동
         report.append(f"{emoji} {ticker}: ${today_prices[ticker]:.2f} ({price_change[ticker]:+.1%})")
     
     report.append("\n" + "-"*20)
@@ -215,19 +212,18 @@ def get_daily_signals_and_report():
             ma_val = ma_lines[ma_key].iloc[-1]
             disparity = (t_price / ma_val) - 1.0
             
-            report.append(f"- {window}일: {state_emoji} ({disparity:-.1%}) {state_change}")
+            report.append(f"- {window}일: {state_emoji} ({disparity:.1%}) {state_change}")
 
-    # 모든 내용을 하나로 합쳐서 반환
     return "\n".join(report)
 
 # --- [4. 메인 실행] ---
 if __name__ == "__main__":
     try:
-        # 1. 리포트 생성 (단일 메시지)
+        # 1. 리포트 생성
         full_report = get_daily_signals_and_report()
         print(full_report)
         
-        # 2. 텔레그램 전송 (한 번만 실행)
+        # 2. 텔레그램 전송
         if send_telegram_message(TELEGRAM_TOKEN, TELEGRAM_TO, full_report, parse_mode='Markdown'):
             print("전송 완료.")
         else:
